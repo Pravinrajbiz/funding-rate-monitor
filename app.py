@@ -109,9 +109,8 @@ def fetch_and_store():
 
 @app.route("/")
 def index():
-    # If no data (e.g., Render cold start), fetch immediately
-    if not latest_results:
-        process_data("https://fapi.binance.com/fapi/v1/premiumIndex")
+    # Force fetch on every page load to prevent blank page
+    process_data("https://fapi.binance.com/fapi/v1/premiumIndex")
     return render_template("index.html", results=latest_results)
 
 @app.route("/history")

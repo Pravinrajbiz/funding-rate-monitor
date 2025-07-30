@@ -96,10 +96,6 @@ def process_data(url):
 
 def fetch_and_store():
     url = "https://fapi.binance.com/fapi/v1/premiumIndex"
-    # Baseline fetch + quick delta fetch
-    process_data(url)
-    time.sleep(5)
-    process_data(url)
 
     # Continuous fetch every 3 minutes
     while True:
@@ -117,7 +113,10 @@ def download_history():
     except FileNotFoundError:
         return "No history file found yet. Please wait for data collection."
 
-# Start background thread (always active on paid plan)
+# ---- Immediate fetch to avoid blank page after deploy ----
+process_data("https://fapi.binance.com/fapi/v1/premiumIndex")
+
+# Start background thread
 threading.Thread(target=fetch_and_store, daemon=True).start()
 
 if __name__ == "__main__":

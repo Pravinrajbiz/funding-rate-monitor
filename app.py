@@ -72,7 +72,6 @@ def process_data(url):
         top_positive_with_occ = update_occurrence(top_positive, positive_occurrence)
         top_negative_with_occ = update_occurrence(top_negative, negative_occurrence)
 
-        # Use timezone-aware UTC now
         timestamp = datetime.now(timezone.utc).astimezone(IST).strftime('%Y-%m-%d %H:%M:%S %Z')
 
         result = {
@@ -98,16 +97,21 @@ def process_data(url):
 def fetch_and_store():
     url = "https://fapi.binance.com/fapi/v1/premiumIndex"
 
-    # Fetch immediately on startup
+    # Initial baseline + quick second fetch to get deltas immediately
+    process_data(url)
+    time.sleep(5)
     process_data(url)
 
-    # Fetch every 3 minutes
+    # Regular loop
     while True:
         process_data(url)
         time.sleep(180)
 
 @app.route("/")
 def index():
+    # If no data (e.g., Render cold start), fetch immediately
+    if not latest_results:
+        process_data("https://fapi.binance.com/fapi/v1/premiumIndex")
     return render_template("index.html", results=latest_results)
 
 @app.route("/history")

@@ -3,67 +3,82 @@
 <head>
     <title>Funding Rate Monitor</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Auto Refresh every 3 minutes -->
+    <meta http-equiv="refresh" content="180">
     <link 
         rel="stylesheet" 
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
-        body { background: #f8f9fa; }
+        body { background: #f8f9fa; font-size: 0.9rem; }
         .positive { color: green; font-weight: bold; }
         .negative { color: red; font-weight: bold; }
         .neutral { color: gray; }
         .card { margin-bottom: 20px; }
+        .column-title { font-size: 1rem; font-weight: 600; margin-bottom: 10px; }
+        .download-btn { margin-bottom: 20px; }
     </style>
 </head>
 <body class="container py-4">
     <h3 class="mb-4">Funding Rate Monitor (Last 3 Results)</h3>
+    <a href="/history" class="btn btn-primary download-btn">Download Full History</a>
+    
     {% for result in results %}
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">{{ result.time }}</h5>
             <hr>
-            <h6>Top 5 Positive</h6>
-            <ul class="list-group mb-3">
-                {% for sym, rate, delta_funding, mark, delta_mark in result.top_positive %}
-                <li class="list-group-item">
-                    <b>{{ sym }}</b> :
-                    funding =
-                    <span class="{{ 'positive' if rate > 0 else 'negative' if rate < 0 else 'neutral' }}">
-                        {{ '%.4f'|format(rate) }}%
-                    </span>
-                    (Δ
-                    <span class="{{ 'positive' if delta_funding > 0 else 'negative' if delta_funding < 0 else 'neutral' }}">
-                        {{ '%.4f'|format(delta_funding) }}%
-                    </span>)
-                    markPrice = {{ '%.4f'|format(mark) }}
-                    (Δ
-                    <span class="{{ 'positive' if delta_mark > 0 else 'negative' if delta_mark < 0 else 'neutral' }}">
-                        {{ '%.4f'|format(delta_mark) }}
-                    </span>)
-                </li>
-                {% endfor %}
-            </ul>
-
-            <h6>Top 5 Negative</h6>
-            <ul class="list-group">
-                {% for sym, rate, delta_funding, mark, delta_mark in result.top_negative %}
-                <li class="list-group-item">
-                    <b>{{ sym }}</b> :
-                    funding =
-                    <span class="{{ 'positive' if rate > 0 else 'negative' if rate < 0 else 'neutral' }}">
-                        {{ '%.4f'|format(rate) }}%
-                    </span>
-                    (Δ
-                    <span class="{{ 'positive' if delta_funding > 0 else 'negative' if delta_funding < 0 else 'neutral' }}">
-                        {{ '%.4f'|format(delta_funding) }}%
-                    </span>)
-                    markPrice = {{ '%.4f'|format(mark) }}
-                    (Δ
-                    <span class="{{ 'positive' if delta_mark > 0 else 'negative' if delta_mark < 0 else 'neutral' }}">
-                        {{ '%.4f'|format(delta_mark) }}
-                    </span>)
-                </li>
-                {% endfor %}
-            </ul>
+            <div class="row">
+                <!-- Left Column (Top 5 Positive) -->
+                <div class="col-md-6">
+                    <div class="column-title">Top 5 Positive</div>
+                    <ul class="list-group">
+                        {% for sym, rate, delta_funding, mark, delta_mark, occ in result.top_positive %}
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span><b>{{ sym }}</b> (Occ: {{ occ }})</span>
+                            <span>
+                                <span class="{{ 'positive' if rate > 0 else 'negative' if rate < 0 else 'neutral' }}">
+                                    {{ '%.4f'|format(rate) }}%
+                                </span>
+                                (Δ 
+                                <span class="{{ 'positive' if delta_funding > 0 else 'negative' if delta_funding < 0 else 'neutral' }}">
+                                    {{ '%.4f'|format(delta_funding) }}%
+                                </span>)
+                                | markPrice {{ '%.4f'|format(mark) }} 
+                                (Δ 
+                                <span class="{{ 'positive' if delta_mark > 0 else 'negative' if delta_mark < 0 else 'neutral' }}">
+                                    {{ '%.4f'|format(delta_mark) }}
+                                </span>)
+                            </span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <!-- Right Column (Top 5 Negative) -->
+                <div class="col-md-6">
+                    <div class="column-title">Top 5 Negative</div>
+                    <ul class="list-group">
+                        {% for sym, rate, delta_funding, mark, delta_mark, occ in result.top_negative %}
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span><b>{{ sym }}</b> (Occ: {{ occ }})</span>
+                            <span>
+                                <span class="{{ 'positive' if rate > 0 else 'negative' if rate < 0 else 'neutral' }}">
+                                    {{ '%.4f'|format(rate) }}%
+                                </span>
+                                (Δ 
+                                <span class="{{ 'positive' if delta_funding > 0 else 'negative' if delta_funding < 0 else 'neutral' }}">
+                                    {{ '%.4f'|format(delta_funding) }}%
+                                </span>)
+                                | markPrice {{ '%.4f'|format(mark) }} 
+                                (Δ 
+                                <span class="{{ 'positive' if delta_mark > 0 else 'negative' if delta_mark < 0 else 'neutral' }}">
+                                    {{ '%.4f'|format(delta_mark) }}
+                                </span>)
+                            </span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
     {% endfor %}

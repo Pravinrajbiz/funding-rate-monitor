@@ -91,20 +91,21 @@ def process_data(url):
             for sym, rate, d_funding, mark, d_mark, occ in top_positive_with_occ + top_negative_with_occ:
                 writer.writerow([timestamp, sym, rate, d_funding, mark, d_mark, occ])
 
+        print(f"Fetched {len(top_positive)} positive, {len(top_negative)} negative at {timestamp}")  # DEBUG
+
     except Exception as e:
-        print("Error fetching data:", e)
+        print("Error fetching data:", e)  # DEBUG
 
 def fetch_and_store():
     url = "https://fapi.binance.com/fapi/v1/premiumIndex"
-    # Continuous fetch every 3 minutes
     while True:
         process_data(url)
         time.sleep(180)
 
 @app.route("/")
 def index():
-    # If no data, show loading template
     if not latest_results:
+        print("No data yet - showing loading page")  # DEBUG
         return render_template("loading.html")
     return render_template("index.html", results=latest_results)
 
@@ -115,7 +116,9 @@ def download_history():
     except FileNotFoundError:
         return "No history file found yet. Please wait for data collection."
 
-# ---- Immediate fetch to avoid initial blank ----
+# ---- Immediate double fetch to ensure startup data ----
+process_data("https://fapi.binance.com/fapi/v1/premiumIndex")
+time.sleep(5)
 process_data("https://fapi.binance.com/fapi/v1/premiumIndex")
 
 # Start background thread

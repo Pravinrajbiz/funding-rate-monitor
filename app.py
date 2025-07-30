@@ -48,6 +48,17 @@ def process_data(url):
         response = requests.get(url, timeout=5)
         data = response.json()
 
+        # DEBUG: log raw data type and sample
+        print("API Response Type:", type(data), "Sample:", str(data)[:200])
+
+        # If API returned an error message instead of normal data
+        if isinstance(data, dict) and "code" in data:
+            print("Binance API returned error:", data)
+            return
+        if not isinstance(data, list):
+            print("Unexpected data format:", data)
+            return
+
         changes = []
         for item in data:
             symbol = item["symbol"]

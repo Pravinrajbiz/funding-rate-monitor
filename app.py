@@ -96,7 +96,6 @@ def process_data(url):
 
 def fetch_and_store():
     url = "https://fapi.binance.com/fapi/v1/premiumIndex"
-
     # Continuous fetch every 3 minutes
     while True:
         process_data(url)
@@ -104,6 +103,9 @@ def fetch_and_store():
 
 @app.route("/")
 def index():
+    # If no data, show loading template
+    if not latest_results:
+        return render_template("loading.html")
     return render_template("index.html", results=latest_results)
 
 @app.route("/history")
@@ -113,7 +115,7 @@ def download_history():
     except FileNotFoundError:
         return "No history file found yet. Please wait for data collection."
 
-# ---- Immediate fetch to avoid blank page after deploy ----
+# ---- Immediate fetch to avoid initial blank ----
 process_data("https://fapi.binance.com/fapi/v1/premiumIndex")
 
 # Start background thread
